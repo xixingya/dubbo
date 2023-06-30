@@ -18,6 +18,7 @@ package org.apache.dubbo.config.deploy;
 
 import org.apache.dubbo.common.config.ReferenceCache;
 import org.apache.dubbo.common.constants.LoggerCodeConstants;
+import org.apache.dubbo.common.constants.RegisterTypeEnum;
 import org.apache.dubbo.common.deploy.AbstractDeployer;
 import org.apache.dubbo.common.deploy.ApplicationDeployer;
 import org.apache.dubbo.common.deploy.DeployListener;
@@ -46,6 +47,7 @@ import org.apache.dubbo.rpc.model.ProviderModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -395,8 +397,10 @@ public class DefaultModuleDeployer extends AbstractDeployer<ModuleModel> impleme
     }
 
     private void checkReferences() {
+        Optional<ModuleConfig> module = configManager.getModule();
+        long timeout = module.map(ModuleConfig::getCheckReferenceTimeout).orElse(30000L);
         for (ReferenceConfigBase<?> rc : configManager.getReferences()) {
-            referenceCache.check(rc, 3000);
+            referenceCache.check(rc, timeout);
         }
     }
 
@@ -424,7 +428,7 @@ public class DefaultModuleDeployer extends AbstractDeployer<ModuleModel> impleme
             asyncExportingFutures.add(future);
         } else {
             if (!sc.isExported()) {
-                sc.export(false);
+                sc.export(RegisterTypeEnum.AUTO_REGISTER_BY_DEPLOYER);
                 exportedServices.add(sc);
             }
         }
@@ -438,7 +442,7 @@ public class DefaultModuleDeployer extends AbstractDeployer<ModuleModel> impleme
         if (!sc.isExported()) {
             return;
         }
-        sc.register();
+        sc.register(true);
     }
 
     private void unexportServices() {
