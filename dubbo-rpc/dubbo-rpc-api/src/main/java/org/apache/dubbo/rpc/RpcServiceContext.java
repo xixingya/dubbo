@@ -202,10 +202,6 @@ public class RpcServiceContext extends RpcContext {
     @Override
     public void setUrl(URL url) {
         this.url = url;
-        if (url.getSide().equals(CommonConstants.CONSUMER)) {
-            this.remoteApplicationName = url.getRemoteApplication();
-            this.setRemoteAddress(url.getHost(), url.getPort());
-        }
     }
 
     /**
