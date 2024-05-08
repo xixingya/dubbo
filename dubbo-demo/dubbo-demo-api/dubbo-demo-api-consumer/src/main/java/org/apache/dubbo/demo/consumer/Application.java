@@ -39,9 +39,12 @@ public class Application {
         reference.setGeneric("true");
 
         DubboBootstrap bootstrap = DubboBootstrap.getInstance();
+        RegistryConfig registryConfig = new RegistryConfig(REGISTRY_URL);
+        // 强制应用级接口订阅
+        System.setProperty("dubbo.application.service-discovery.migration", "FORCE_APPLICATION");
         bootstrap
                 .application(new ApplicationConfig("dubbo-demo-api-consumer"))
-                .registry(new RegistryConfig(REGISTRY_URL))
+                .registry(registryConfig)
                 .protocol(new ProtocolConfig(CommonConstants.DUBBO, -1))
                 .reference(reference)
                 .start();

@@ -38,9 +38,13 @@ public class Application {
         service.setRef(new DemoServiceImpl());
 
         DubboBootstrap bootstrap = DubboBootstrap.getInstance();
+        RegistryConfig registryConfig = new RegistryConfig(REGISTRY_URL);
+        registryConfig.setRegisterMode("instance");
+        // 上报metadata到远程
+        System.setProperty("dubbo.metadata-report.report-metadata", "true");
         bootstrap
                 .application(new ApplicationConfig("dubbo-demo-api-provider"))
-                .registry(new RegistryConfig(REGISTRY_URL))
+                .registry(registryConfig)
                 .protocol(new ProtocolConfig(CommonConstants.DUBBO, -1))
                 .service(service)
                 .start()
